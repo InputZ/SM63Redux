@@ -90,8 +90,8 @@ func apply_powerup_modifiers():
 	if modifiers.metal:               	# METAL MARIO: Constant Attributes
 		player_attributes.movement_speed = 0.75
 		player_shader.saturation = 0.0
-		player_shader.contrast = 0.8
-		player_shader.brightness = 1.0
+		player_shader.contrast = 0.6
+		player_shader.brightness = 1.05
 		modifiers.invulnerable = true
 
 func metal_mario_handler():
