@@ -26,8 +26,6 @@ var command_hints = [
 	["locale", "Changes the language of the game"], # In _ready() all language options will be added
 	["report", "<report...>", "Report a bug"],
 	["rename", "<report...>", "Renames a bug report title"],
-	
-	["powerup", ["give", "remove"], "metal", "Enables a powerup"],
 ]
 var selected_completion = {
 	selected = false,
@@ -236,24 +234,6 @@ func run_command(cmd: String):
 					HTTPClient.METHOD_POST,
 					JSON.stringify({"content":"renamed to \"" + hook_name + "\"", "username": hook_name})
 					)
-					
-			"powerup":
-				if len(args) < 2: 
-					Singleton.log_msg("No arguments provided.")
-					return
-				if args[1] == "give": 
-					match args[2]:
-						"metal":
-							Global.grant_powerup(1)
-							Singleton.log_msg("Granted metal powerup for 30 seconds.")
-				elif args[1] == "remove":
-					match args[2]:
-						"metal":
-							if !Global.Game.Player.Modifier.metal: 
-								Singleton.log_msg("Mario does not have this powerup applied")
-								return
-							Global.revoke_powerup(1)
-							Singleton.log_msg("Revoked metal powerup.")							
 			_:
 				Singleton.log_msg("Unknown command \"%s\"." % args[0], Singleton.LogType.ERROR)
 
