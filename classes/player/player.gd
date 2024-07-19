@@ -176,8 +176,11 @@ var body_rotation: float = 0 # Rotation of the body sprite
 @onready var ground_failsafe_check: Area2D = $GroundFailsafe
 @onready var feet_area: Area2D = $Feet
 
+var Mario = Global.Game.Player
 
 func _ready():
+	
+	
 	
 	switch_state(S.NEUTRAL) # reset state to avoid short mario glitch
 	
@@ -223,10 +226,12 @@ func _on_BackupAngle_body_exited(_body):
 
 var water_areas: int = 0
 func _on_WaterCheck_area_entered(_area):
-	swimming = true
+	Mario.State.in_water = true
+	swimming = !Mario.Modifier.metal
 	water_areas += 1
 	# Reset state to normal
-	switch_state(S.NEUTRAL)
+	if (state == S.POUND and !Mario.Modifier.metal):
+		switch_state(S.NEUTRAL)
 	# Refill FLUDD
 	water = max(water, 100)
 	
@@ -236,6 +241,7 @@ func _on_WaterCheck_area_entered(_area):
 
 
 func _on_WaterCheck_area_exited(_area):
+	Mario.State.in_water = false
 	water_areas -= 1
 	
 	# Only run exit-water code if we're now in NO water
@@ -328,6 +334,23 @@ func player_physics():
 	
 	action_spin()
 	
+	## METAL MARIO HANDLING ##
+	mario_shader()
+	if Mario.Modifier.metal: 
+		Global.metal_mario_handler()
+		swimming = false
+		Global.start_timer($PowerupHandler/MetalMario/MetalMarioTimer)
+		if get_tree().root.get_node("/root/MetalMarioTimer").time_left <= 4:
+			var timer = get_tree().root.get_node("/root/MetalMarioTimer")
+			var time_left = timer.time_left
+			time_left *= 2
+			Mario.Shader.saturation = 1.0 - (ceil(time_left) - time_left)
+			if time_left <= 0: 
+				Global.revoke_powerup(1)
+
+	else: swimming = Mario.State.in_water
+	###########################
+	
 	if bouncing:
 		action_bounce()
 	else:
@@ -353,9 +376,15 @@ func player_physics():
 	
 	player_move()
 	
+	
 	if state == S.POUND and is_on_floor():
 		vel.x = 0 # Stop sliding down into holes
 
+func mario_shader() -> void:
+	var mario_shader = Global.Game.Player.Shader
+	sprite.material.set_shader_parameter("mario_saturation", mario_shader.saturation)
+	sprite.material.set_shader_parameter("mario_brightness", mario_shader.brightness)
+	sprite.material.set_shader_parameter("mario_contrast", mario_shader.contrast)
 
 func assertions() -> void:
 	# Value of facing_direction never becomes 0, or anything unexpected
@@ -556,9 +585,9 @@ func action_spin() -> void:
 			play_sfx("spin", "air")
 		if !grounded:
 			if swimming:
-				vel.y = min(-2, vel.y)
+				vel.y = min(-2, vel.y) * Mario.Attribute.spin_air_strength
 			else:
-				vel.y = min(-3.5 * FPS_MOD * 1.3, vel.y - 3.5 * FPS_MOD)
+				vel.y = min(-3.5 * FPS_MOD * 1.3, vel.y - 3.5 * FPS_MOD) * Mario.Attribute.spin_air_strength
 		spin_frames = SPIN_TIME
 
 
@@ -697,7 +726,7 @@ func player_control_x() -> void:
 				if state == S.POUND:
 					vel.x = 0
 				elif state != S.DIVE:
-					vel.x += dir * WALK_ACCEL
+					vel.x += dir * WALK_ACCEL * Mario.Attribute.movement_speed
 			else:
 				var core_vel = dir * max((AIR_ACCEL - dir * vel.x) / (AIR_SPEED_CAP / (3 * FPS_MOD)), 0)
 				if state & (S.TRIPLE_JUMP | S.SPIN | S.BACKFLIP | S.HURT):
@@ -768,11 +797,11 @@ func action_jump() -> void:
 		0: # Single
 			switch_state(S.NEUTRAL)
 			play_sfx("voice", "jump1")
-			vel.y = -JUMP_VEL_1
+			vel.y = -JUMP_VEL_1 * Mario.Attribute.jump_strength
 			double_jump_state += 1
 		1: # Double
 			switch_state(S.NEUTRAL)
-			vel.y = -JUMP_VEL_2
+			vel.y = -JUMP_VEL_2 * Mario.Attribute.jump_strength
 			play_sfx("voice", "jump2")
 			double_jump_state += 1
 		2: # Triple
@@ -784,14 +813,14 @@ func action_jump() -> void:
 				frontflip_direction = facing_direction
 				
 				# Apply triple jump impulse
-				vel.y = -JUMP_VEL_3
+				vel.y = -JUMP_VEL_3 * Mario.Attribute.jump_strength
 				# ...which goes forward too
 				vel.x += (vel.x + 15 * FPS_MOD * sign(vel.x)) / 5 * FPS_MOD
 				
 				# Apply triple jump aesthetic effects
 				play_sfx("voice", "jump3")
 			else:
-				vel.y = -JUMP_VEL_2
+				vel.y = -JUMP_VEL_2 * Mario.Attribute.jump_strength
 				play_sfx("voice", "jump2")
 	
 	# warning-ignore:return_value_discarded
@@ -825,8 +854,8 @@ func _can_backflip() -> bool:
 func action_backflip() -> void:
 	off_ground()
 	switch_state(S.BACKFLIP)
-	vel.y = min(-JUMP_VEL_1 - 2.5 * FPS_MOD, vel.y)
-	vel.x += (30.0 - abs(vel.x)) / (5 / FPS_MOD) * -facing_direction
+	vel.y = min(-JUMP_VEL_1 - 2.5 * FPS_MOD, vel.y) * Mario.Attribute.jump_strength
+	vel.x += (30.0 - abs(vel.x)) / (5 / FPS_MOD) * -facing_direction * Mario.Attribute.movement_speed
 	dive_resetting = false
 	crouch_resetting = false
 	backflip_flip_frames = 0
@@ -937,7 +966,7 @@ func player_fall() -> void:
 			else:
 				fall_adjust = air_resistance(fall_adjust)
 		
-		vel.y += (fall_adjust - vel.y) * FPS_MOD # Adjust the Y velocity according to the framerate
+		vel.y += (fall_adjust - vel.y) * Mario.Attribute.gravity * FPS_MOD # Adjust the Y velocity according to the framerate
 
 
 func ground_friction() -> void:
@@ -1017,7 +1046,7 @@ const POUND_SHAKE_INITIAL = 4
 const POUND_SHAKE_MULTIPLIER = 0.75
 func manage_pound_recover() -> void:
 	if state == S.POUND:
-		if pound_land_frames == 12: # just hit ground
+		if pound_land_frames == 12 and is_on_floor(): # just hit ground
 			pound_state = Pound.LAND
 			
 			# Dispatch star effect
@@ -1214,7 +1243,7 @@ var fade_timer = 0
 @onready var lowpass: AudioEffectFilter = AudioServer.get_bus_effect(Singleton.WATER_LPF_BUS, 0)
 @onready var reverb: AudioEffectReverb = AudioServer.get_bus_effect(Singleton.WATER_VRB_BUS, 0)
 func manage_water_audio(delta):
-	if swimming:
+	if Mario.State.in_water:
 		# Fade in water fx
 		fade_timer = min(fade_timer + delta * 60, FADE_TIME)
 	else:
@@ -1385,7 +1414,7 @@ func switch_state(new_state):
 
 
 func take_damage(amount):
-	if invuln_frames <= 0 and !locked:
+	if invuln_frames <= 0 and !locked and !Mario.Modifier.invulnerable:
 		hp = clamp(hp - amount, 0, 8) # TODO - multi HP
 		invuln_frames = 180
 

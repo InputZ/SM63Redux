@@ -1,4 +1,4 @@
-[gd_scene load_steps=158 format=3 uid="uid://bujgheqb6pmrc"]
+[gd_scene load_steps=161 format=3 uid="uid://bujgheqb6pmrc"]
 
 [ext_resource type="Script" path="res://classes/dejitter_group/dejitter_group.gd" id="1"]
 [ext_resource type="Script" path="res://classes/player/fludd_spray_renderer.gd" id="2"]
@@ -21,6 +21,70 @@
 [ext_resource type="Script" path="res://classes/player/fludd_sprite.gd" id="19"]
 [ext_resource type="Script" path="res://classes/player/character_sprite.gd" id="21"]
 [ext_resource type="Script" path="res://classes/autoplay.gd" id="22"]
+[ext_resource type="AudioStream" uid="uid://dlugkf1vgm6dj" path="res://classes/player/music/MetalMario.ogg" id="22_rfldo"]
+
+[sub_resource type="Shader" id="Shader_k5lav"]
+code = "shader_type canvas_item;
+
+void vertex() {
+	// Called for every vertex the material is visible on.
+}
+
+uniform float mario_opacity = 1.0;
+uniform float mario_saturation = 1.0;
+uniform float mario_brightness = 1.0; 
+uniform float mario_contrast = 1.0;
+
+void fragment() {
+	vec4 ImageTexture = texture(TEXTURE, UV);
+
+	// Calculate luminance
+	float grayscale = dot(ImageTexture.rgb, vec3(0.299, 0.587, 0.114));
+
+	// Apply contrast
+	grayscale = (grayscale - 0.5) * mario_contrast + 0.5;
+
+	// Apply brightness
+	grayscale += (mario_brightness - 1.0);
+
+	// Clamp grayscale to ensure it stays within [0, 1]
+	grayscale = clamp(grayscale, 0.0, 1.0);
+
+	// Apply saturation
+	vec3 saturatedColor = mix(vec3(grayscale), ImageTexture.rgb, mario_saturation);
+
+	// Output final color
+	COLOR = vec4(saturatedColor, ImageTexture.a * mario_opacity);
+}
+
+
+	
+	//if(ImageTexture.r < 0.914) {
+		//COLOR.r = 0.2;
+	//}
+	//if(COLOR.r <= 0.2 && ImageTexture.g >= 0.25 && ImageTexture.b < 0.3) {
+		//COLOR.g = 0.8;
+	//}
+	//if(COLOR.r <= 0.2 && COLOR.g <= 0.5 && COLOR.b < 0.1) {
+		//COLOR.g = 0.25;
+	//}
+		//if(COLOR.r <= 0.2 && COLOR.g <= 0.5 && COLOR.b > 0.1) {
+		//COLOR.g = 0.4;
+	//}
+
+
+//void light() {
+	// Called for every pixel for every light affecting the CanvasItem.
+	// Uncomment to replace the default light processing function with this one.
+//}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gbtbi"]
+shader = SubResource("Shader_k5lav")
+shader_parameter/mario_opacity = 1.0
+shader_parameter/mario_saturation = 1.0
+shader_parameter/mario_brightness = 0.0
+shader_parameter/mario_contrast = 1.0
 
 [sub_resource type="AtlasTexture" id="129"]
 atlas = ExtResource("8")
@@ -1161,11 +1225,9 @@ particle_flag_align_y = true
 particle_flag_disable_z = true
 direction = Vector3(0, 1, 0)
 spread = 7.5
-gravity = Vector3(0, 675, 0)
 initial_velocity_min = 300.0
 initial_velocity_max = 450.0
-orbit_velocity_min = 0.0
-orbit_velocity_max = 0.0
+gravity = Vector3(0, 675, 0)
 scale_min = 1.25
 scale_max = 1.5
 scale_curve = SubResource("56")
@@ -1224,6 +1286,7 @@ script = ExtResource("1")
 
 [node name="CharacterSprite" type="AnimatedSprite2D" parent="CharacterGroup"]
 process_priority = 1
+material = SubResource("ShaderMaterial_gbtbi")
 sprite_frames = SubResource("3")
 animation = &"walk_start"
 script = ExtResource("21")
@@ -1371,6 +1434,19 @@ collision_mask = 0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Feet"]
 position = Vector2(0, 15)
 shape = SubResource("52")
+
+[node name="PowerupHandler" type="Node" parent="."]
+
+[node name="MetalMario" type="Node" parent="PowerupHandler"]
+
+[node name="MetalMarioMusic" type="AudioStreamPlayer" parent="PowerupHandler/MetalMario"]
+process_mode = 3
+stream = ExtResource("22_rfldo")
+bus = &"Music"
+
+[node name="MetalMarioTimer" type="Timer" parent="PowerupHandler/MetalMario"]
+wait_time = 30.0
+one_shot = true
 
 [connection signal="area_entered" from="WaterCheck" to="." method="_on_WaterCheck_area_entered"]
 [connection signal="area_exited" from="WaterCheck" to="." method="_on_WaterCheck_area_exited"]
