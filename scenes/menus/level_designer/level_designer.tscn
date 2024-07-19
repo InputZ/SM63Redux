@@ -1,4 +1,4 @@
-[gd_scene load_steps=63 format=3 uid="uid://dj1885yxyxc7y"]
+[gd_scene load_steps=64 format=3 uid="uid://dj1885yxyxc7y"]
 
 [ext_resource type="Script" path="res://scenes/menus/level_designer/menu_control.gd" id="1"]
 [ext_resource type="Script" path="res://scenes/menus/level_designer/ld_main.gd" id="2"]
@@ -36,6 +36,7 @@
 [ext_resource type="StyleBox" uid="uid://c4t05jli7tvcf" path="res://scenes/menus/level_designer/ldui/list_item_box_normal.tres" id="37"]
 [ext_resource type="StyleBox" uid="uid://bxk000r2o0auh" path="res://scenes/menus/level_designer/ldui/list_item_box_hover.tres" id="38"]
 [ext_resource type="Texture2D" uid="uid://cpokwabiivjyv" path="res://scenes/menus/level_designer/ldui/hermes.png" id="38_bx2fd"]
+[ext_resource type="PackedScene" uid="uid://cefrpa6ytxl3h" path="res://scenes/menus/level_designer/save_manager/SaveManager.tscn" id="38_qbe77"]
 [ext_resource type="StyleBox" uid="uid://27dvir8jkf4y" path="res://scenes/menus/level_designer/ldui/list_item_box_press.tres" id="39"]
 
 [sub_resource type="AtlasTexture" id="10"]
@@ -258,20 +259,22 @@ texture_hover = SubResource("18")
 [node name="UILayer" type="CanvasLayer" parent="."]
 
 [node name="SaveDialog" type="FileDialog" parent="UILayer"]
-size = Vector2i(390, 154)
+position = Vector2i(0, 36)
+size = Vector2i(599, 159)
 mode_overrides_title = false
 access = 2
-filters = PackedStringArray("*.63r ; SM63 Redux Level")
+filters = PackedStringArray("*.json ; SM63 Redux Level")
 script = ExtResource("6")
 
 [node name="OpenDialog" type="FileDialog" parent="UILayer"]
 title = "Open a File"
-size = Vector2i(390, 154)
+position = Vector2i(0, 36)
+size = Vector2i(482, 159)
 ok_button_text = "Open"
 mode_overrides_title = false
 file_mode = 0
 access = 2
-filters = PackedStringArray("*.63r ; SM63 Redux Level")
+filters = PackedStringArray("*.json ; SM63 Redux Level")
 script = ExtResource("27")
 
 [node name="LDUI" type="Control" parent="UILayer"]
@@ -517,6 +520,8 @@ anchor_bottom = 0.5
 offset_top = -42.0
 offset_bottom = -14.0
 text = "Placeholder Loading Text"
+
+[node name="SaveManager" parent="." instance=ExtResource("38_qbe77")]
 
 [connection signal="finished" from="Music" to="Music" method="_on_Music_finished"]
 [connection signal="pressed" from="UIFollow/Selection/Buttons/Dragger" to="UIFollow/Selection/Buttons" method="_on_dragger_pressed"]

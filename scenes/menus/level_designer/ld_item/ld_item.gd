@@ -51,14 +51,11 @@ var properties: Dictionary = {}
 @onready var control = $"/root/Main/UILayer/LDUI"
 @onready var property_menu = $"/root/Main/UILayer/PropertyMenu"
 
-
 func _ready():
 	if ghost:
 		modulate.a = 0.5
 		position = main.snap_vector(get_global_mouse_position())
-	
-	# Size my hitbox to match my texture
-	$ClickArea/CollisionShape2D.shape.size = texture.get_size()
+
 
 
 func _input(event):
@@ -164,6 +161,16 @@ func set_glowing(should_glow):
 		# Thankfully, removing it is much less of an ordeal.
 		material = null
 
+func update_texture():
+	var img_texture
+	var texture_handler = $TextureHandler
+	img_texture = load(texture_handler.translate_textures(item_id))
+	texture = img_texture
+	img_texture.get_rid()
+	
+	# Size my hitbox to match my texture
+	
+	$ClickArea/CollisionShape2D.shape.size = texture.get_size()
 
 func item_disabled_tint(disabled) -> void:
 	var val = 0.5 if disabled else 1.0

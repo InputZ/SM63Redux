@@ -1,16 +1,54 @@
 [gd_scene load_steps=4 format=3 uid="uid://csa57rmr8n2rn"]
 
 [ext_resource type="Script" path="res://scenes/menus/level_designer/ld_item/ld_item.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://dkywuyiypek76" path="res://classes/decorative/arrow/arrow.png" id="2"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 resource_local_to_scene = true
 
+[sub_resource type="GDScript" id="GDScript_x34ab"]
+script/source = "extends Node
+
+func translate_textures(item_id):
+	match item_id:
+		0: return \"res://scenes/menus/level_designer/icons/pickup/coin_yellow.tres\"
+		1: return \"res://scenes/menus/level_designer/icons/pickup/coin_red.tres\"
+		2: return \"res://scenes/menus/level_designer/icons/pickup/coin_blue.tres\"
+		3: return \"\"
+		4: return \"res://classes/pickup/shine/shine_placed.png\"
+		5: return \"\"
+		6: return \"res://classes/solid/log/log.png\"
+		7: return \"res://classes/solid/log/log_fall.png\"
+		8: return \"res://classes/solid/telescoping/tipping_log/tipping_log_middle.png\"
+		9: return \"res://classes/solid/telescoping/cloud/cloud_middle.png\"
+		10: return \"res://classes/solid/wooden_platform/wooden_platform.png\"
+		11: return \"res://classes/interactable/pipe/pipe.png\"
+		12: return \"res://classes/entity/enemy/goomba/goomba_placed.png\"
+		13: return \"res://classes/entity/enemy/koopa/parakoopa_placed.png\"
+		14: return \"res://classes/entity/enemy/koopa/koopa_placed.png\"
+		15: return \"res://classes/entity/enemy/koopa/shell_icon.png\"
+		16: return \"res://classes/entity/enemy/bobomb/bobomb_icon.png\"
+		17: return \"res://scenes/menus/level_designer/icons/enemy/cheep_cheep.tres\"
+		18: return \"res://classes/entity/passive/goonie/goonie_swoop.png\"
+		19: return \"res://classes/decorative/butterfly/butterfly_placed.png\"
+		20: return \"res://classes/interactable/sign/sign.png\"
+		21: return \"res://classes/pickup/bottle/bottle_small.png\"
+		22: return \"res://classes/pickup/bottle/bottle_big.png\"
+		23: return \"res://classes/pickup/fludd_box/box_hover.png\"
+		24: return \"res://classes/decorative/big_tree.png\"
+		25: return \"res://classes/decorative/small_tree.png\"
+		26: return \"res://classes/solid/rocks/big_rock/big_rock.png\"
+		27: return \"res://classes/decorative/arrow/arrow.png\"
+		28: return \"res://classes/misc/twirl_heart/twirl_heart_icon.png\"
+		29: return \"res://classes/solid/breakable_box/box1.png\"
+"
+
 [node name="LDItem" type="Sprite2D"]
-texture = ExtResource("2")
 script = ExtResource("1")
 
 [node name="ClickArea" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ClickArea"]
 shape = SubResource("1")
+
+[node name="TextureHandler" type="Node" parent="."]
+script = SubResource("GDScript_x34ab")

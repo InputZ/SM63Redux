@@ -9,6 +9,10 @@ var logged_errors = PackedStringArray([])
 
 
 ## Generates a binary representation of the level.
+
+func generate_level_json():
+	var items = null
+
 func generate_level_binary(
 	items: Array[Node], polygons: Array[Node], main: LDMain
 ) -> PackedByteArray:

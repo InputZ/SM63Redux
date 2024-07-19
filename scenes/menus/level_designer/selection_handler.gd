@@ -19,6 +19,8 @@ var selection_hit = []
 @onready var hover = $Hover
 @onready var buttons = $Buttons
 @onready var polygon_edit_button = $Buttons/Polygon
+@onready var texture_handler = $TextureHandler
+
 
 
 func _process(dt):
