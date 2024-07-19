@@ -249,6 +249,9 @@ func run_command(cmd: String):
 				elif args[1] == "remove":
 					match args[2]:
 						"metal":
+							if !Global.Game.Player.Modifier.metal: 
+								Singleton.log_msg("Mario does not have this powerup applied")
+								return
 							Global.revoke_powerup(1)
 							Singleton.log_msg("Revoked metal powerup.")							
 			_:
