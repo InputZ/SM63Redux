@@ -1,7 +1,8 @@
-[gd_scene load_steps=18 format=3 uid="uid://r5f5n67eg4l4"]
+[gd_scene load_steps=26 format=3 uid="uid://r5f5n67eg4l4"]
 
 [ext_resource type="Texture2D" uid="uid://cvwn7pwfvemfr" path="res://classes/entity/passive/goonie/goonie_flap.png" id="1"]
 [ext_resource type="Script" path="res://classes/ride_area.gd" id="2"]
+[ext_resource type="Texture2D" uid="uid://br6qd1yhbp7wn" path="res://classes/entity/passive/goonie/goonie_cry_flap.png" id="3_iaeai"]
 [ext_resource type="Texture2D" uid="uid://drat0agloi4wd" path="res://classes/entity/passive/goonie/goonie_swoop.png" id="6"]
 [ext_resource type="Script" path="res://classes/entity/passive/goonie/goonie.gd" id="9"]
 [ext_resource type="Script" path="res://classes/zone/safety_net/safety_net.gd" id="10"]
@@ -12,6 +13,34 @@ size = Vector2(24, 2)
 
 [sub_resource type="RectangleShape2D" id="2"]
 size = Vector2(24, 14)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_03ryj"]
+atlas = ExtResource("3_iaeai")
+region = Rect2(0, 0, 43, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t5bct"]
+atlas = ExtResource("3_iaeai")
+region = Rect2(43, 0, 43, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mrgmo"]
+atlas = ExtResource("3_iaeai")
+region = Rect2(86, 0, 43, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jcs4f"]
+atlas = ExtResource("3_iaeai")
+region = Rect2(129, 0, 43, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3cvc6"]
+atlas = ExtResource("3_iaeai")
+region = Rect2(172, 0, 43, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gbuh1"]
+atlas = ExtResource("3_iaeai")
+region = Rect2(215, 0, 43, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5x14y"]
+atlas = ExtResource("3_iaeai")
+region = Rect2(258, 0, 43, 44)
 
 [sub_resource type="AtlasTexture" id="5"]
 atlas = ExtResource("1")
@@ -43,6 +72,32 @@ region = Rect2(258, 0, 43, 44)
 
 [sub_resource type="SpriteFrames" id="3"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_03ryj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t5bct")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mrgmo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jcs4f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3cvc6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gbuh1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5x14y")
+}],
+"loop": true,
+"name": &"cry_flap",
+"speed": 10.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("5")
@@ -105,7 +160,7 @@ one_way_collision = true
 z_index = 3
 position = Vector2(0, -2)
 sprite_frames = SubResource("3")
-animation = &"flap"
+animation = &"cry_flap"
 script = ExtResource("11")
 
 [node name="SafetyNet" type="Area2D" parent="."]

@@ -6,6 +6,7 @@ const TIME_DOWN: int = 84 # Maximum time a bird will swoop down
 @export var disabled: bool = false: set = set_disabled
 @export var mirror: bool = false
 
+var crying: bool = false
 var rng = RandomNumberGenerator.new()
 var vel: Vector2 = Vector2.ZERO
 var reset_position: Vector2 = position
@@ -63,7 +64,10 @@ func physics_step() -> void:
 			body.set_velocity(move_vec * 60.0)
 			body.set_up_direction(Vector2.UP)
 			body.move_and_slide()
-		sprite.animation = "flap"
+			if (body.name == "Player" and Global.Game.Player.Modifier.metal): crying = true
+			else: crying = false
+		if (!crying): sprite.animation = "flap"
+		else: sprite.animation = "cry_flap"
 		sprite.speed_scale = 3
 		position += move_vec
 	else:
